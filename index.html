@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title id="doc-title">FLUXO DE TRABALHO NGC - CASA CIVIL</title>
+<style>
+:root{
+  --bg:#f7f8fa;--text:#0f1520;--muted:#55657d;
+  --panel:#ffffff;--border:#d6dde5;--accent:#0b72ff;--accent2:#16a34a;
+  --warn:#f59e0b;--orange:#f97316;--danger:#ef4444;--shadow:0 8px 24px rgba(15,21,32,.08);
+}
+.theme-dark{--bg:#0f172a;--text:#e5e7eb;--muted:#9ca3af;--panel:#111827;--border:#374151;--accent:#60a5fa;--accent2:#22c55e;--shadow:0 8px 24px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Inter,Arial;background:var(--bg);color:var(--text)}
+
+/* HEADER & APP LAYOUT */
+header{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--border);z-index:30}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:8px 16px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:40px}
+.title{font-weight:800;text-transform:uppercase}
+nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+nav button{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:var(--shadow);text-transform:uppercase}
+nav button.active{border-color:var(--accent);color:var(--accent)}
+nav button[disabled]{opacity:.5;cursor:not-allowed}
+.user-info{font-size:12px;color:var(--muted);margin-left:12px;text-transform:uppercase}
+
+/* MAIN container */
+main{position:relative;height:calc(100vh - 120px);padding:16px;overflow:hidden}
+.section{
+  display:none;
+  position:absolute; inset:16px;
+  background:var(--panel);border:1px solid var(--border);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);
+  overflow:auto;
+}
+.section.active{display:flex;flex-direction:column}
+
+/* Inner cards */
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);
+}
+
+/* HEADINGS */
+h2{margin:0 0 12px 0;font-size:18px;text-transform:uppercase}
+.section h3{margin:0 0 8px 0;font-size:14px;color:var(--muted);font-weight:800;text-transform:uppercase}
+
+/* GRIDS */
+.grid{display:grid;gap:12px}
+.grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.grid.auto-fit-kpi{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+
+/* KPI */
+.kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+.kpi .label{color:var(--muted);font-size:12px;text-transform:uppercase}
+.kpi .value{font-size:26px;margin-top:6px;font-weight:800}
+
+/* TABLES */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;width:100%;box-shadow:var(--shadow);flex:1}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
+th{background:#eef3fb;font-weight:800;text-transform:uppercase}
+.table-wrap table thead{position:sticky;top:0;background:#eef3fb;z-index:2}
+
+/* Registros: nowrap exceto Razão Social */
+#registros table th,#registros table td{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+#registros table td:nth-child(3), #registros table th:nth-child(3){white-space:normal}
+
+/* Column min-widths */
+#registros colgroup col.col-data{min-width:110px}
+#registros colgroup col.col-cnpj{min-width:140px}
+#registros colgroup col.col-razao{min-width:240px}
+#registros colgroup col.col-proc{min-width:140px}
+#registros colgroup col.col-tr{min-width:100px}
+#registros colgroup col.col-setor{min-width:140px}
+#registros colgroup col.col-assunto{min-width:140px}
+#registros colgroup col.col-status{min-width:220px}
+#registros colgroup col.col-tecnico{min-width:120px}
+#registros colgroup col.col-mov{min-width:120px}
+#registros colgroup col.col-tempo{min-width:120px}
+#registros colgroup col.col-acao{min-width:160px}
+#registros colgroup col.col-final{min-width:160px}
+#registros colgroup col.col-obs{min-width:200px}
+#registros colgroup col.col-actions{min-width:140px}
+
+/* TOOLBAR & FORM */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toolbar input,.toolbar select,.toolbar textarea{background:var(--panel);border:1px solid var(--border);padding:12px;border-radius:10px;box-shadow:var(--shadow);text-transform:uppercase}
+.toolbar button{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700;text-transform:uppercase}
+.toolbar button.secondary{background:#fff;color:var(--text);border:1px solid var(--border)}
+
+.form-vertical{display:flex;flex-direction:column;gap:10px}
+.form-vertical label{font-size:12px;color:var(--text);margin-bottom:6px;font-weight:800;text-transform:uppercase}
+.form-vertical input,.form-vertical select,.form-vertical textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--panel);text-transform:uppercase}
+
+/* STATUS BADGES */
+.status-badge{display:inline-block;padding:6px 12px;border-radius:12px;font-size:12px;border:1px solid var(--border);font-weight:800;white-space:pre-line;text-transform:uppercase}
+.status-ok{color:var(--accent2);border-color:var(--accent2);background:#eaf7ef}
+.status-warn{color:var(--warn);border-color:var(--warn);background:#fff6e6}
+.status-orange{color:var(--orange);border-color:var(--orange);background:#fff0e8}
+.status-danger{color:var(--danger);border-color:var(--danger);background:#ffeceb}
+
+.hidden{display:none!important}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-card{width:560px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.brand-login{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.brand-login img{height:44px}
+.no-transform{ text-transform:none !important; }
+
+/* FOOTER */
+footer{background:var(--panel);border-top:1px solid var(--border)}
+.footer-bar{text-align:center;padding:12px;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase}
+
+/* MODALS */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-backdrop.show{display:flex}
+.modal{width:640px;background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
+.modal h3{margin:0 0 12px 0;text-transform:uppercase}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+
+/* small screens */
+@media (max-width:1100px){
+  #registros colgroup col.col-status{min-width:180px}
+  #registros colgroup col.col-obs{min-width:160px}
+}
+@media (max-width:900px){
+  .grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}
+  main{height:calc(100vh - 140px)}
+}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div id="login" class="login-wrap">
+  <div class="login-card">
+    <div class="brand-login">
+      <img id="login-logo" src="logo.png" alt="LOGO"/>
+      <h1 id="login-title" style="font-size:18px;margin:0;">FLUXO DE TRABALHO NGC - CASA CIVIL</h1>
+    </div>
+    <div class="form-vertical" style="margin-bottom:8px">
+      <div><label>Usuário</label><input id="login-user" class="no-transform" type="text" placeholder="digite seu usuário"/></div>
+      <div><label>Senha</label><input id="login-pass" class="no-transform" type="password" placeholder="sua senha"/></div>
+    </div>
+    <div class="toolbar" style="margin-bottom:8px">
+      <button id="btn-login">Entrar</button>
+      <button id="btn-forgot" class="secondary">Esqueci minha senha</button>
+    </div>
+    <p id="login-msg" class="tag"></p>
+  </div>
+</div>
+
+<header id="app-header" class="hidden">
+  <div class="header-inner">
+    <div class="brand">
+      <img id="app-logo" src="logo.png" alt="LOGO"/>
+      <div id="app-title" class="title">FLUXO DE TRABALHO NGC - CASA CIVIL</div>
+    </div>
+    <nav>
+      <button id="tab-dashboard" class="active">DASHBOARD</button>
+      <button id="tab-fila">FILA DE TRABALHO</button>
+      <button id="tab-registros">REGISTROS</button>
+      <button id="tab-novo">NOVO REGISTRO</button>
+      <button id="tab-relatorios">RELATÓRIOS</button>
+      <button id="tab-importar">IMPORTAR/EXPORTAR</button>
+      <button id="tab-config">CONFIGURAÇÕES</button>
+      <button id="btn-logout" class="secondary">SAIR</button>
+      <span class="user-info" id="user-info"></span>
+    </nav>
+  </div>
+</header>
+
+<main id="app-main" class="hidden">
+  <!-- DASHBOARD (sem gráficos; lista de parados) -->
+  <section id="dashboard" class="section active">
+    <h2>DASHBOARD</h2>
+    <div class="grid auto-fit-kpi" style="margin-bottom:12px">
+      <div class="kpi"><div class="label">PARADOS A MAIS DE 15 DIAS</div><div class="value" id="kpi-parados">0</div></div>
+      <div class="kpi"><div class="label">AÇÃO PRÓXIMA DO LIMITE</div><div class="value" id="kpi-acao-limite">0</div></div>
+      <div class="kpi"><div class="label">FINALIZAÇÃO PRÓXIMA DO LIMITE</div><div class="value" id="kpi-final-limite">0</div></div>
+      <div class="kpi"><div class="label">FILA PENDENTE</div><div class="value" id="kpi-fila">0</div></div>
+    </div>
+
+    <!-- Lista de processos parados; sai ao movimentar -->
+    <div class="table-wrap" style="margin-top:12px;max-height:380px">
+      <table>
+        <thead><tr><th>PROCESSO</th><th>RAZÃO SOCIAL</th><th>STATUS</th><th>DIAS PARADO</th><th>AÇÃO</th><th>FINALIZAÇÃO</th></tr></thead>
+        <tbody id="tbody-criticos"></tbody>
+      </table>
+    </div>
+
+    <div class="grid auto-fit-kpi" style="margin-top:12px">
+      <div class="kpi"><div class="label">TOTAL</div><div class="value" id="kpi-total">0</div></div>
+      <div class="kpi"><div class="label">EM ANDAMENTO</div><div class="value" id="kpi-andamento">0</div></div>
+      <div class="kpi"><div class="label">FINALIZADOS</div><div class="value" id="kpi-finalizado">0</div></div>
+      <div class="kpi"><div class="label">TEMPO MÉDIO (DIAS)</div><div class="value" id="kpi-tempo">0</div></div>
+    </div>
+  </section>
+
+  <!-- FILA -->
+  <section id="fila" class="section">
+    <h2>FILA DE TRABALHO</h2>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>PROCESSO SGPE</label><input id="fila-sgpe" type="text"/></div></div>
+      <div class="form-vertical"><div><label>ASSUNTO</label><select id="fila-assunto"></select></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>DATA FILA</label><input id="fila-data" type="text" placeholder="DD/MM/AAAA"/></div></div>
+      <div class="form-vertical"><div><label>Nº DIAS</label><input id="fila-dias" type="text" disabled/></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>TÉCNICO DIRECIONADO</label><select id="fila-tecnico"></select></div></div>
+      <div class="form-vertical"><div><label>STATUS (VISUAL)</label><input id="fila-status" type="text" value="PENDENTE" disabled/></div></div>
+    </div>
+    <div class="toolbar" style="margin-bottom:10px"><button id="btn-fila-add">ADICIONAR À FILA</button><span id="fila-msg" class="tag"></span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>PROCESSO SGPE</th><th>ASSUNTO</th><th>DATA FILA</th><th>Nº DIAS</th><th>TÉCNICO</th><th>STATUS</th><th>AÇÕES</th></tr></thead>
+        <tbody id="tbody-fila"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- REGISTROS -->
+  <section id="registros" class="section">
+    <h2>REGISTROS</h2>
+
+    <colgroup>
+      <col class="col-data"><col class="col-cnpj"><col class="col-razao"><col class="col-proc"><col class="col-tr">
+      <col class="col-setor"><col class="col-assunto"><col class="col-status"><col class="col-tecnico"><col class="col-mov">
+      <col class="col-tempo"><col class="col-acao"><col class="col-final"><col class="col-obs"><col class="col-actions">
+    </colgroup>
+
+    <div class="toolbar">
+      <input id="filter-search" type="text" placeholder="BUSCAR POR RAZÃO SOCIAL, PROCESSO, CNPJ..."/>
+      <select id="filter-status"><option value="">STATUS (TODOS)</option></select>
+      <select id="filter-tecnico"><option value="">TÉCNICO (TODOS)</option></select>
+      <select id="filter-setor"><option value="">SETOR (TODOS)</option></select>
+      <button id="btn-filter-atrasados" class="secondary">MOSTRAR APENAS ATRASADOS</button>
+      <button id="btn-clear-filters" class="secondary">LIMPAR FILTROS</button>
+      <span class="tag" id="count-visible">0 VISÍVEIS</span>
+    </div>
+    <div class="table-wrap" style="margin-top:10px;">
+      <table>
+        <thead>
+          <tr>
+            <th>DATA CADASTRO</th><th>CNPJ</th><th>RAZÃO SOCIAL</th><th>Nº PROCESSO</th><th>Nº TR</th>
+            <th>SETOR ATUAL</th><th>ASSUNTO</th><th style="min-width:220px">STATUS</th>
+            <th>TÉCNICO</th><th>DATA MOVIMENTAÇÃO</th><th>TEMPO (DIAS)</th>
+            <th style="min-width:160px">AÇÃO</th><th style="min-width:160px">FINALIZAÇÃO</th>
+            <th>OBSERVAÇÕES</th><th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- NOVO -->
+  <section id="novo" class="section">
+    <h2>NOVO REGISTRO</h2>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>DATA CADASTRO</label><input id="new-data" type="text" placeholder="DD/MM/AAAA"/></div></div>
+      <div class="form-vertical"><div><label>CNPJ</label><input id="new-cnpj" type="text"/></div></div>
+    </div>
+    <div class="form-vertical" style="margin-bottom:12px"><div><label>RAZÃO SOCIAL</label><input id="new-razao" type="text"/></div></div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>Nº PROCESSO</label><input id="new-proc" type="text"/></div></div>
+      <div class="form-vertical"><div><label>Nº TR</label><input id="new-tr" type="text"/></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>SETOR ATUAL</label><select id="new-setor"></select></div></div>
+      <div class="form-vertical"><div><label>ASSUNTO</label><select id="new-assunto"></select></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>STATUS</label><select id="new-status"></select></div></div>
+      <div class="form-vertical"><div><label>TÉCNICO</label><select id="new-tecnico"></select></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>DATA MOVIMENTAÇÃO</label><input id="new-mov" type="text" placeholder="DD/MM/AAAA"/></div></div>
+      <div class="form-vertical"><div><label>PRAZO PARA AÇÃO (DIAS)</label><input id="new-prazo-acao" type="number" min="0" placeholder="EX.: 5"/></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>PRAZO PARA FINALIZAÇÃO (DIAS)</label><input id="new-prazo-final" type="number" min="0" placeholder="EX.: 8"/></div></div>
+      <div class="form-vertical"><div><label>OBSERVAÇÕES</label><textarea id="new-obs" rows="5"></textarea></div></div>
+    </div>
+    <div class="toolbar" style="margin-top:10px">
+      <button id="btn-add">ADICIONAR</button>
+      <span id="new-msg" class="tag"></span>
+    </div>
+  </section>
+
+  <!-- RELATÓRIOS -->
+  <section id="relatorios" class="section">
+    <h2>RELATÓRIOS</h2>
+    <div class="toolbar">
+      <select id="report-type">
+        <option value="status">POR STATUS</option>
+        <option value="tecnico">POR TÉCNICO</option>
+        <option value="setor">POR SETOR</option>
+        <option value="atrasados">ATRASADOS A MAIS DE 15 DIAS</option>
+        <option value="tempo-setor">TEMPO MÉDIO POR SETOR</option>
+        <option value="finalizacoes-mes">FINALIZAÇÕES POR MÊS</option>
+        <option value="mais-recentes">MOVIMENTAÇÕES MAIS RECENTES</option>
+        <option value="sem-mov-x">SEM MOVIMENTAÇÃO ≥ X DIAS</option>
+        <option value="fila-historico">FILA DE TRABALHO (HISTÓRICO)</option>
+      </select>
+      <input id="report-xdias" type="number" min="1" value="30"/>
+      <button id="btn-run-report">GERAR RELATÓRIO</button>
+      <button id="btn-export-pdf" class="secondary">EXPORTAR PDF (FILA)</button>
+      <button id="btn-export-excel" class="secondary">EXPORTAR EXCEL (RELATÓRIO)</button>
+      <button id="btn-export-csv" class="secondary">EXPORTAR CSV (RELATÓRIO)</button>
+      <span class="tag" id="report-count">0 ITENS</span>
+    </div>
+    <div class="table-wrap" style="margin-top:10px;">
+      <table>
+        <thead id="report-head"></thead>
+        <tbody id="report-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- IMPORTAR/EXPORTAR -->
+  <section id="importar" class="section">
+    <h2>IMPORTAR/EXPORTAR</h2>
+    <div class="grid cols-3" style="flex:1">
+      <div class="card">
+        <h3>IMPORTAR JSON</h3>
+        <div class="form-vertical">
+          <div><label>ARQUIVO</label><input type="file" id="fileJson" accept=".json"/></div>
+          <div class="toolbar"><button id="btn-import-json">IMPORTAR JSON</button><span id="import-msg-json" class="tag"></span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMPORTAR CSV (REGISTROS)</h3>
+        <div class="form-vertical">
+          <div><label>ARQUIVO</label><input type="file" id="fileCsv" accept=".csv"/></div>
+          <div class="toolbar"><button id="btn-import-csv">IMPORTAR CSV</button><span id="import-msg-csv" class="tag"></span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>EXPORTAR DADOS</h3>
+        <div class="toolbar">
+          <button id="btn-export-json">BAIXAR DADOS.JSON</button>
+          <button id="btn-export-csv-data" class="secondary">BAIXAR DADOS.CSV</button>
+          <button id="btn-export-xlsx-data" class="secondary">BAIXAR DADOS.XLSX</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIGURAÇÕES -->
+  <section id="config" class="section">
+    <h2>CONFIGURAÇÕES</h2>
+    <div class="grid cols-2" style="flex:1;gap:20px">
+      <div class="card">
+        <h3>IDENTIDADE DO SISTEMA</h3>
+        <div class="form-vertical">
+          <div><label>NOME DO SISTEMA</label><input id="sys-name" type="text" placeholder="ex.: fluxo de trabalho ngc - casa civil"/></div>
+          <div class="toolbar"><button id="btn-save-sysname">SALVAR NOME</button><span id="sysname-msg" class="tag"></span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>TEMA E CORES</h3>
+        <div class="form-vertical">
+          <div><label>MODO</label>
+            <select id="theme-select">
+              <option value="light">CLARO</option>
+              <option value="dark">ESCURO</option>
+              <option value="gray">CINZA</option>
+            </select>
+          </div>
+          <div><label>COR DE FUNDO</label><input type="color" id="bg-color" value="#f7f8fa"/></div>
+          <div><label>COR DE DESTAQUE</label><input type="color" id="accent-color" value="#0b72ff"/></div>
+          <div><label>COR DO TEXTO</label><input type="color" id="text-color" value="#0f1520"/></div>
+          <div class="toolbar"><button id="btn-apply-theme">APLICAR</button><button id="btn-reset-theme" class="secondary">PADRÃO</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>LOGO</h3>
+        <div class="form-vertical">
+          <div><label>SELECIONAR IMAGEM</label><input type="file" id="logo-input" accept="image/*"/></div>
+          <div class="toolbar"><button id="btn-save-logo">SALVAR LOGO</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>USUÁRIOS/SERVIDORES</h3>
+        <div class="form-vertical">
+          <div class="tag">SENHAS VISÍVEIS NA LISTA (AMBIENTE FECHADO)</div>
+          <div><label>NOME DE USUÁRIO</label><input id="usr-name" type="text"/></div>
+          <div><label>EMAIL</label><input id="usr-email" type="text"/></div>
+          <div><label>PERFIL</label>
+            <select id="usr-role">
+              <option value="admin">ADMIN</option>
+              <option value="usuario">USUÁRIO</option>
+            </select>
+          </div>
+          <div><label>SENHA</label><input id="usr-pass" type="text" placeholder="ex.: 123456"/></div>
+          <div class="toolbar"><button id="btn-add-user">ADICIONAR/ATUALIZAR USUÁRIO</button><span id="user-msg" class="tag"></span></div>
+        </div>
+        <div class="table-wrap" style="margin-top:8px;max-height:260px">
+          <table>
+            <thead><tr><th>USUÁRIO</th><th>EMAIL</th><th>PERFIL</th><th>SENHA</th><th>AÇÕES</th></tr></thead>
+            <tbody id="tbody-users"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>LISTAS E PRAZOS</h3>
+        <div class="form-vertical">
+          <div><label>TÉCNICOS (UM POR LINHA)</label><textarea id="list-tecnicos" rows="6"></textarea></div>
+          <div><label>SETORES (UM POR LINHA)</label><textarea id="list-setores" rows="6"></textarea></div>
+          <div><label>ASSUNTOS (UM POR LINHA)</label><textarea id="list-assuntos" rows="6"></textarea></div>
+          <div><label>STATUS (UM POR LINHA)</label><textarea id="list-status" rows="6"></textarea></div>
+          <div class="grid cols-2">
+            <div class="form-vertical"><div><label>LIMITE ALERTA AÇÃO (DIAS)</label><input id="cfg-lim-acao" type="number" min="0" value="5"/></div></div>
+            <div class="form-vertical"><div><label>LIMITE ALERTA FINALIZAÇÃO (DIAS)</label><input id="cfg-lim-final" type="number" min="0" value="8"/></div></div>
+          </div>
+          <div class="toolbar"><button id="btn-save-lists">SALVAR LISTAS E PRAZOS</button><span id="lists-msg" class="tag"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="app-footer" class="hidden">
+  <div id="footer-bar" class="footer-bar">
+    SISTEMA DESENVOLVIDO POR <span style="color:var(--accent)">RICHARD MOTTA COELHO</span> • USO EXCLUSIVO DOS NGCs • <span id="footer-sysname">FLUXO DE TRABALHO NGC - CASA CIVIL</span>
+  </div>
+</footer>
+
+<!-- MODAL DE SENHA PARA ABRIR CONFIGURAÇÕES -->
+<div id="config-auth-backdrop" class="modal-backdrop">
+  <div class="modal">
+    <h3>ACESSO ÀS CONFIGURAÇÕES</h3>
+    <p class="tag">Informe a senha do administrador para abrir a tela de configurações.</p>
+    <div class="form-vertical" style="margin-bottom:12px">
+      <div><label>SENHA DO ADMINISTRADOR</label><input id="config-auth-pass" type="password" class="no-transform" placeholder="senha do admin"/></div>
+    </div>
+    <div class="actions">
+      <button id="btn-config-auth-enter">ENTRAR</button>
+      <button id="btn-config-auth-close" class="secondary">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIÇÃO -->
+<div id="edit-backdrop" class="modal-backdrop">
+  <div class="modal">
+    <h3>EDIÇÃO DO REGISTRO</h3>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>DATA CADASTRO</label><input id="edit-data" type="text" placeholder="DD/MM/AAAA"/></div></div>
+      <div class="form-vertical"><div><label>CNPJ</label><input id="edit-cnpj" type="text"/></div></div>
+    </div>
+    <div class="form-vertical" style="margin-bottom:12px"><div><label>RAZÃO SOCIAL</label><input id="edit-razao" type="text"/></div></div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>Nº PROCESSO</label><input id="edit-proc" type="text"/></div></div>
+      <div class="form-vertical"><div><label>Nº TR</label><input id="edit-tr" type="text"/></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>SETOR ATUAL</label><select id="edit-setor"></select></div></div>
+      <div class="form-vertical"><div><label>ASSUNTO</label><select id="edit-assunto"></select></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>STATUS</label><select id="edit-status"></select></div></div>
+      <div class="form-vertical"><div><label>TÉCNICO</label><select id="edit-tecnico"></select></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>DATA MOVIMENTAÇÃO</label><input id="edit-mov" type="text" placeholder="DD/MM/AAAA"/></div></div>
+      <div class="form-vertical"><div><label>PRAZO PARA AÇÃO (DIAS)</label><input id="edit-prazo-acao" type="number" min="0"/></div></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:12px">
+      <div class="form-vertical"><div><label>PRAZO PARA FINALIZAÇÃO (DIAS)</label><input id="edit-prazo-final" type="number" min="0"/></div></div>
+      <div class="form-vertical"><div><label>OBSERVAÇÕES</label><textarea id="edit-obs" rows="5"></textarea></div></div>
+    </div>
+    <div class="actions">
+      <button id="btn-edit-save">SALVAR</button>
+      <button id="btn-edit-cancel" class="secondary">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+  // Keys
+  const STORAGE_KEY='ngc_fluxo_v1';
+  const USERS_KEY='ngc_users_v_plain';
+  const SESSION_KEY='ngc_session_v1';
+  const LOGO_KEY='ngc_logo_v1';
+  const THEME_KEY='ngc_theme_v1';
+  const LISTS_KEY='ngc_lists_v1';
+  const CFG_KEY='ngc_cfg_v1';
+  const FILA_KEY='ngc_fila_v1';
+  const FILA_HIST_KEY='ngc_fila_hist_v1';
+  const SYSNAME_KEY='ngc_sysname_v1';
+
+  // Utils
+  function loadJSON(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}}
+  function saveJSON(k,o){localStorage.setItem(k,JSON.stringify(o))}
+  function parseDateBR(str){if(!str) return null; const p=str.split('/'); if(p.length!==3) return null; const [dd,mm,yy]=p.map(x=>parseInt(x,10)); const d=new Date(yy,mm-1,dd); return isNaN(d)?null:d}
+  function fmtDateBR(d){ if(!d) return ''; return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` }
+  function daysBetween(startStr,endStr){const s=parseDateBR(startStr);const e=endStr?parseDateBR(endStr):new Date(); if(!s||!e||isNaN(s)||isNaN(e)) return ''; return Math.floor((e-s)/(1000*60*60*24))}
+  function daysUntil(dateStr){const d=parseDateBR(dateStr); if(!d) return ''; const today=new Date(); today.setHours(0,0,0,0); d.setHours(0,0,0,0); return Math.floor((d - today)/(1000*60*60*24))}
+  function daysIdle(r){ if((r['STATUS']||'').toUpperCase()==='FINALIZADO') return 0; const ref=r['DATA MOVIMENTAÇÃO']||r['DATA CADASTRO']; return daysBetween(ref, fmtDateBR(new Date())) }
+  function idleClass(d){ if(d<=3) return 'status-ok'; if(d<=5) return 'status-warn'; if(d<=10) return 'status-orange'; return 'status-danger' }
+  function addDaysFromToday(n){ const d=new Date(); d.setDate(d.getDate()+n); return fmtDateBR(d) }
+  function aggregate(arr){ const m=new Map(); for(const v of arr) m.set(v,(m.get(v)||0)+1); return Array.from(m.entries()) }
+  function monthKey(d){ return `${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` }
+  function statusLabel(r){
+    const s=(r['STATUS']||'').trim().toUpperCase();
+    if(s==='FINALIZADO') return 'FINALIZADO';
+    const d=daysIdle(r);
+    return `${s}\n${d} DIAS PARADO`;
+  }
+
+  // Data
+  let registros=loadJSON(STORAGE_KEY)||[];
+  let fila=loadJSON(FILA_KEY)||[];
+  let session=loadJSON(SESSION_KEY)||null;
+  let lists=loadJSON(LISTS_KEY)||{
+    tecnicos:['RICHARD','JANAINA','DANIELA','TANIMERI','ELISANDRA','LARISSA','ZADIR'],
+    setores:['SCC/CS','SCC/FLN','FCEE/SEPCO','SIGEF/INTERGRA','FESPORTE/GEAFC/SEPCO','PTL/SCDIG','FCEE/SAPRE','SAS','FCC','SES/GECOT/PCCON'],
+    assuntos:['LICITAÇÃO','CONTRATO','DILIGÊNCIA','DOCUMENTAÇÃO','ANÁLISE','OUTROS'],
+    status:['EM ANDAMENTO','FINALIZADO','AGUARDANDO DOCUMENTOS','DILIGÊNCIA']
+  };
+  let cfg=loadJSON(CFG_KEY)||{limAcao:5,limFinal:8};
+  let sysname=localStorage.getItem(SYSNAME_KEY)||'FLUXO DE TRABALHO NGC - CASA CIVIL';
+
+  // System name
+  function setSysName(name){
+    sysname=name||'FLUXO DE TRABALHO NGC - CASA CIVIL';
+    localStorage.setItem(SYSNAME_KEY,sysname);
+    document.getElementById('app-title').textContent=sysname;
+    document.getElementById('login-title').textContent=sysname;
+    document.getElementById('footer-sysname').textContent=sysname;
+    document.title=sysname;
+  }
+  setSysName(sysname);
+
+  // Ensure default admin user and hard fallback
+  function ensureDefaultAdmin(){
+    const users=loadJSON(USERS_KEY)||{};
+    if(!users['adminngc']){ users['adminngc']={pass:'123456',role:'admin',email:''}; saveJSON(USERS_KEY,users); }
+  }
+  ensureDefaultAdmin();
+
+  // UI
+  function setUI(on){
+    document.getElementById('login').classList.toggle('hidden',on);
+    document.getElementById('app-header').classList.toggle('hidden',!on);
+    document.getElementById('app-main').classList.toggle('hidden',!on);
+    document.getElementById('app-footer').classList.toggle('hidden',!on);
+    const role=session?.role||'usuario';
+    document.getElementById('tab-novo').disabled=(role!=='admin');
+    document.getElementById('tab-importar').disabled=(role!=='admin');
+    const ui=document.getElementById('user-info');
+    if(ui && session){ ui.textContent=`USUÁRIO: ${String(session.user).toUpperCase()} (${role.toUpperCase()})`; }
+  }
+
+  // Tabs
+  const tabDefs=[
+    {btn:'tab-dashboard',sec:'dashboard'},
+    {btn:'tab-fila',sec:'fila'},
+    {btn:'tab-registros',sec:'registros'},
+    {btn:'tab-novo',sec:'novo'},
+    {btn:'tab-relatorios',sec:'relatorios'},
+    {btn:'tab-importar',sec:'importar'}
+  ];
+  function activateSection(idBtn,idSec){
+    tabDefs.forEach(t=>{
+      document.getElementById(t.btn).classList.remove('active');
+      document.getElementById(t.sec).classList.remove('active');
+    });
+    document.getElementById('config').classList.remove('active');
+    document.getElementById(idBtn).classList.add('active');
+    document.getElementById(idSec).classList.add('active');
+  }
+  tabDefs.forEach(t=>{
+    document.getElementById(t.btn).onclick=()=>{
+      activateSection(t.btn,t.sec);
+      if(t.sec==='dashboard'){ updateKPIs(); }
+      if(t.sec==='fila') renderFila();
+      if(t.sec==='registros') renderRegistros();
+    };
+  });
+
+  // CONFIG auth
+  document.getElementById('tab-config').onclick=()=>{
+    document.getElementById('config-auth-pass').value='';
+    document.getElementById('config-auth-backdrop').classList.add('show');
+  };
+  function openConfigTab(){
+    tabDefs.forEach(t=>{
+      document.getElementById(t.btn).classList.remove('active');
+      document.getElementById(t.sec).classList.remove('active');
+    });
+    document.getElementById('tab-config').classList.add('active');
+    document.getElementById('config').classList.add('active');
+    renderUsersTable();
+    populateLists();
+  }
+  document.getElementById('btn-config-auth-enter').onclick=()=>{
+    const pass=(document.getElementById('config-auth-pass').value||'').trim();
+    const users=loadJSON(USERS_KEY)||{};
+    const admin=users['adminngc'];
+    if(!admin || String(admin.pass)!==pass){ alert('Senha incorreta.'); return; }
+    document.getElementById('config-auth-backdrop').classList.remove('show');
+    openConfigTab();
+  };
+  document.getElementById('btn-config-auth-close').onclick=()=>{
+    document.getElementById('config-auth-backdrop').classList.remove('show');
+  };
+
+  // LOGIN actions (robusto com fallback)
+  document.getElementById('btn-login').onclick=()=>{
+    const userInput=(document.getElementById('login-user').value||'').trim();
+    const passInput=(document.getElementById('login-pass').value||'').trim();
+    if(!userInput||!passInput){ document.getElementById('login-msg').textContent='INFORME USUÁRIO E SENHA.'; return; }
+    const userKey=userInput.toLowerCase();
+    let users=loadJSON(USERS_KEY)||{};
+    // Fallback: aceita adminngc/123456 sempre e regrava
+    if((userKey==='adminngc') && passInput==='123456'){
+      users['adminngc']={pass:'123456',role:'admin',email:users['adminngc']?.email||''};
+      saveJSON(USERS_KEY,users);
+      session={user:'adminngc',role:'admin'}; saveJSON(SESSION_KEY,session);
+      document.getElementById('login-msg').textContent='';
+      setUI(true); updateAll(); return;
+    }
+    const u=users[userKey];
+    if(!u){ document.getElementById('login-msg').textContent='USUÁRIO NÃO CADASTRADO.'; return; }
+    if(String(u.pass)!==passInput){ document.getElementById('login-msg').textContent='SENHA INCORRETA.'; return; }
+    session={user:userKey,role:u.role||'usuario'}; saveJSON(SESSION_KEY,session);
+    document.getElementById('login-msg').textContent='';
+    setUI(true); updateAll();
+  };
+  document.getElementById('btn-forgot').onclick=()=>{
+    document.getElementById('login-msg').textContent='Consulte o administrador para redefinir sua senha.';
+  };
+  document.getElementById('btn-logout').onclick=()=>{
+    session=null; localStorage.removeItem(SESSION_KEY);
+    document.getElementById('config').classList.remove('active');
+    activateSection('tab-dashboard','dashboard');
+    setUI(false);
+  };
+
+  // Theme / logo
+  function applyThemeFromStorage(){
+    const th=loadJSON(THEME_KEY);
+    document.body.classList.toggle('theme-dark', th?.mode==='dark');
+    document.documentElement.style.setProperty('--accent', th?.accent||'#0b72ff');
+    document.documentElement.style.setProperty('--bg', th?.bg||'#f7f8fa');
+    document.documentElement.style.setProperty('--text', th?.text||'#0f1520');
+  }
+  applyThemeFromStorage();
+  document.getElementById('btn-apply-theme').onclick=()=>{
+    const mode=document.getElementById('theme-select').value;
+    const bg=document.getElementById('bg-color').value;
+    const accent=document.getElementById('accent-color').value;
+    const text=document.getElementById('text-color').value;
+    saveJSON(THEME_KEY,{mode,bg,accent,text}); applyThemeFromStorage();
+  };
+  document.getElementById('btn-reset-theme').onclick=()=>{
+    localStorage.removeItem(THEME_KEY); applyThemeFromStorage();
+  };
+  document.getElementById('btn-save-logo').onclick=()=>{
+    const f=document.getElementById('logo-input').files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{ localStorage.setItem(LOGO_KEY,r.result); document.getElementById('login-logo').src=r.result; document.getElementById('app-logo').src=r.result; };
+    r.readAsDataURL(f);
+  };
+  const savedLogo=localStorage.getItem(LOGO_KEY);
+  if(savedLogo){ document.getElementById('login-logo').src=savedLogo; document.getElementById('app-logo').src=savedLogo; }
+
+  // Users
+  function renderUsersTable(){
+    const users=loadJSON(USERS_KEY)||{};
+    const tbody=document.getElementById('tbody-users'); if(!tbody) return;
+    tbody.innerHTML='';
+    Object.entries(users).forEach(([u,info])=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${String(u).toUpperCase()}</td><td>${info.email||''}</td><td>${(info.role||'usuario').toUpperCase()}</td><td>${info.pass||''}</td>
+      <td>
+        <button class="secondary" data-act="fill" data-user="${u}">PREENCHER</button>
+        ${u!=='adminngc'?`<button class="secondary" data-act="del" data-user="${u}">EXCLUIR</button>`:''}
+      </td>`;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('button').forEach(b=>{
+      const act=b.dataset.act; const user=b.dataset.user;
+      b.onclick=()=>{
+        const users=loadJSON(USERS_KEY)||{};
+        if(act==='del'){
+          if(confirm(`Excluir usuário "${user}"?`)){ delete users[user]; saveJSON(USERS_KEY,users); renderUsersTable(); }
+        }
+        if(act==='fill'){
+          const info=users[user]||{};
+          document.getElementById('usr-name').value=String(user).toUpperCase();
+          document.getElementById('usr-email').value=info.email||'';
+          document.getElementById('usr-role').value=info.role||'usuario';
+          document.getElementById('usr-pass').value=info.pass||'';
+        }
+      };
+    });
+  }
+  document.getElementById('btn-add-user').onclick=()=>{
+    const uRaw=(document.getElementById('usr-name').value||'').trim();
+    const uKey=uRaw.toLowerCase();
+    const email=(document.getElementById('usr-email').value||'').trim();
+    const role=(document.getElementById('usr-role').value||'usuario');
+    const pass=(document.getElementById('usr-pass').value||'').trim();
+    if(!uKey||!pass){ document.getElementById('user-msg').textContent='INFORME USUÁRIO E SENHA.'; return; }
+    const users=loadJSON(USERS_KEY)||{};
+    users[uKey]={pass,role,email};
+    saveJSON(USERS_KEY,users);
+    document.getElementById('user-msg').textContent='USUÁRIO SALVO/ATUALIZADO.';
+    // Limpa formulário após salvar
+    document.getElementById('usr-name').value='';
+    document.getElementById('usr-email').value='';
+    document.getElementById('usr-role').value='usuario';
+    document.getElementById('usr-pass').value='';
+    // adiciona na lista de técnicos
+    const listsStored=loadJSON(LISTS_KEY)||lists;
+    const upDisplay=uKey.toUpperCase();
+    if(!listsStored.tecnicos.includes(upDisplay)){
+      listsStored.tecnicos.push(upDisplay);
+      saveJSON(LISTS_KEY,listsStored);
+    }
+    populateLists();
+    renderUsersTable();
+  };
+
+  // Lists & cfg
+  document.getElementById('btn-save-lists').onclick=()=>{
+    const tecs=(document.getElementById('list-tecnicos').value||'').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>s.toUpperCase());
+    const sets=(document.getElementById('list-setores').value||'').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>s.toUpperCase());
+    const assuntos=(document.getElementById('list-assuntos').value||'').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>s.toUpperCase());
+    const sts=(document.getElementById('list-status').value||'').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>s.toUpperCase());
+    cfg.limAcao=parseInt(document.getElementById('cfg-lim-acao').value,10)||cfg.limAcao;
+    cfg.limFinal=parseInt(document.getElementById('cfg-lim-final').value,10)||cfg.limFinal;
+    const currentLists=loadJSON(LISTS_KEY)||lists;
+    lists={
+      tecnicos:tecs.length?tecs:currentLists.tecnicos,
+      setores:sets.length?sets:currentLists.setores,
+      assuntos:assuntos.length?assuntos:currentLists.assuntos,
+      status:sts.length?sts:currentLists.status
+    };
+    saveJSON(LISTS_KEY,lists); saveJSON(CFG_KEY,cfg);
+    document.getElementById('lists-msg').textContent='LISTAS E PRAZOS SALVOS.';
+    // Limpa os textos das listas
+    document.getElementById('list-tecnicos').value='';
+    document.getElementById('list-setores').value='';
+    document.getElementById('list-assuntos').value='';
+    document.getElementById('list-status').value='';
+    populateLists(); updateKPIs(); renderRegistros(); renderFila();
+  };
+
+  document.getElementById('btn-save-sysname').onclick=()=>{
+    const name=(document.getElementById('sys-name').value||'').trim();
+    if(!name){ document.getElementById('sysname-msg').textContent='INFORME O NOME DO SISTEMA.'; return; }
+    setSysName(name);
+    document.getElementById('sysname-msg').textContent='NOME DO SISTEMA ATUALIZADO.';
+    document.getElementById('sys-name').value='';
+  };
+
+  // Populate selects
+  function populateLists(){
+    const listsStored=loadJSON(LISTS_KEY)||lists;
+    lists=listsStored;
+
+    const tecTargets=['filter-tecnico','new-tecnico','edit-tecnico','fila-tecnico'];
+    const setTargets=['filter-setor','new-setor','edit-setor'];
+    const assTargets=['fila-assunto','new-assunto','edit-assunto'];
+    const stTargets=['filter-status','new-status','edit-status'];
+
+    tecTargets.forEach(id=>{
+      const el=document.getElementById(id); if(!el) return; const prev=el.value;
+      el.innerHTML=(id==='filter-tecnico')?'<option value="">TÉCNICO (TODOS)</option>':'';
+      lists.tecnicos.forEach(t=>{ const o=document.createElement('option'); o.textContent=t; o.value=t; el.appendChild(o); });
+      if(prev) el.value=prev;
+    });
+    setTargets.forEach(id=>{
+      const el=document.getElementById(id); if(!el) return; const prev=el.value;
+      el.innerHTML=(id==='filter-setor')?'<option value="">SETOR (TODOS)</option>':'';
+      lists.setores.forEach(s=>{ const o=document.createElement('option'); o.textContent=s; o.value=s; el.appendChild(o); });
+      if(prev) el.value=prev;
+    });
+    stTargets.forEach(id=>{
+      const el=document.getElementById(id); if(!el) return; const prev=el.value;
+      el.innerHTML=(id==='filter-status')?'<option value="">STATUS (TODOS)</option>':'';
+      lists.status.forEach(s=>{ const o=document.createElement('option'); o.textContent=s; o.value=s; el.appendChild(o); });
+      if(prev) el.value=prev;
+    });
+    assTargets.forEach(id=>{
+      const el=document.getElementById(id); if(!el) return; const prev=el.value;
+      el.innerHTML='';
+      lists.assuntos.forEach(a=>{ const o=document.createElement('option'); o.textContent=a; o.value=a; el.appendChild(o); });
+      if(prev) el.value=prev;
+    });
+
+    document.getElementById('cfg-lim-acao').value=cfg.limAcao;
+    document.getElementById('cfg-lim-final').value=cfg.limFinal;
+    document.getElementById('sys-name').value=sysname;
+  }
+
+  // Fila
+  function renderFila(){
+    const dataInput=document.getElementById('fila-data');
+    const diasInput=document.getElementById('fila-dias');
+    if(dataInput && diasInput){
+      dataInput.oninput=()=>{ const d=daysBetween(dataInput.value, fmtDateBR(new Date())); diasInput.value=(typeof d==='number')?`${d} DIAS`:''; };
+    }
+    const tbody=document.getElementById('tbody-fila'); tbody.innerHTML='';
+    fila.forEach((f,i)=>{
+      const dias=daysBetween(f.data, fmtDateBR(new Date()));
+      const cls=idleClass(typeof dias==='number'?dias:0);
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${f.sgpe||''}</td><td>${(f.assunto||'').toUpperCase()}</td><td>${f.data||''}</td>
+        <td><span class="status-badge ${cls}">${typeof dias==='number'?dias:0} DIAS</span></td>
+        <td>${(f.tecnico||'').toUpperCase()}</td><td>${(f.status||'PENDENTE')}</td>
+        <td>
+          <button class="secondary" data-act="aceitar" data-idx="${i}">ACEITAR</button>
+          <button class="secondary" data-act="pegar" data-idx="${i}">PEGAR</button>
+          <button class="secondary" data-act="del" data-idx="${i}">EXCLUIR</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('button').forEach(b=>{
+      const act=b.dataset.act, idx=parseInt(b.dataset.idx,10);
+      b.onclick=()=>{
+        if(act==='aceitar'){
+          const item=fila[idx];
+          registros.push({
+            "DATA CADASTRO": item.data||'',
+            "CNPJ": '',
+            "RAZÃO SOCIAL": '',
+            "Nº PROCESSO": item.sgpe||'',
+            "Nº TR": '',
+            "SETOR ATUAL": '',
+            "ASSUNTO": (item.assunto||'').toUpperCase(),
+            "STATUS": "EM ANDAMENTO",
+            "TÉCNICO": (item.tecnico||'').toUpperCase(),
+            "DATA MOVIMENTAÇÃO": '',
+            "PRAZO AÇÃO (DIAS)": '',
+            "PRAZO FINALIZAÇÃO (DIAS)": '',
+            "DATA LIMITE AÇÃO": '',
+            "DATA LIMITE FINALIZAÇÃO": '',
+            "OBSERVAÇÕES": "MIGRADO DA FILA"
+          });
+          const hist=loadJSON(FILA_HIST_KEY)||[];
+          hist.push({...item,status:'ACEITO',aceitoPor:session?.user||'',dataAceite:fmtDateBR(new Date())});
+          saveJSON(FILA_HIST_KEY,hist);
+          fila.splice(idx,1);
+          saveJSON(STORAGE_KEY,registros); saveJSON(FILA_KEY,fila);
+          renderFila(); renderRegistros(); updateKPIs();
+        }
+        if(act==='pegar'){
+          fila[idx].tecnico=(session?.user||fila[idx].tecnico||'').toUpperCase();
+          saveJSON(FILA_KEY,fila); renderFila();
+        }
+        if(act==='del'){
+          if(confirm('EXCLUIR ESTE ITEM DA FILA?')){ fila.splice(idx,1); saveJSON(FILA_KEY,fila); renderFila(); updateKPIs(); }
+        }
+      };
+    });
+  }
+  document.getElementById('btn-fila-add').onclick=()=>{
+    const sgpe=(document.getElementById('fila-sgpe').value||'').trim().toUpperCase();
+    const assunto=(document.getElementById('fila-assunto').value||'').trim().toUpperCase();
+    const data=(document.getElementById('fila-data').value||'').trim();
+    const tecnico=(document.getElementById('fila-tecnico').value||'').trim().toUpperCase();
+    if(!sgpe||!data){ document.getElementById('fila-msg').textContent='INFORME SGPE E DATA DA FILA.'; return; }
+    fila.push({sgpe,assunto,data,tecnico,status:'PENDENTE'});
+    saveJSON(FILA_KEY,fila);
+    document.getElementById('fila-msg').textContent='ADICIONADO À FILA.';
+    // Limpa formulário da Fila
+    document.getElementById('fila-sgpe').value='';
+    document.getElementById('fila-assunto').value='';
+    document.getElementById('fila-data').value='';
+    document.getElementById('fila-tecnico').value='';
+    document.getElementById('fila-dias').value='';
+    renderFila(); updateKPIs();
+  };
+
+  // Registros
+  function prazoBadge(label,diasRest){
+    if(diasRest==='') return '';
+    const overdue=diasRest<0;
+    const cls=overdue?'status-danger':(diasRest<=cfg.limAcao||diasRest<=cfg.limFinal?'status-warn':'status-ok');
+    const texto=overdue?`${label}\nVENCIDO HÁ ${Math.abs(diasRest)} DIAS`:`${label}\nEM ${diasRest} DIAS`;
+    return `<span class="status-badge ${cls}">${texto}</span>`;
+  }
+  function tempoBadge(diaValor){
+    if(diaValor==='') return '';
+    const v=Number(diaValor);
+    const cls=idleClass(isNaN(v)?0:v);
+    return `<span class="status-badge ${cls}">TEMPO\n${isNaN(v)?'—':v+' DIAS'}</span>`;
+  }
+  function renderRegistros(){
+    const q=(document.getElementById('filter-search').value||'').trim().toUpperCase();
+    const fs=document.getElementById('filter-status').value;
+    const ft=document.getElementById('filter-tecnico').value;
+    const fset=document.getElementById('filter-setor').value;
+    const atrasadosOnly=document.getElementById('btn-filter-atrasados').dataset.on==='1';
+    const filtered=registros.filter(r=>{
+      const textMatch=[r['RAZÃO SOCIAL'],r['Nº PROCESSO'],r['CNPJ']].some(v=>((v||'').toUpperCase()).includes(q));
+      const stMatch=!fs||(r['STATUS']||'')===fs;
+      const teMatch=!ft||(r['TÉCNICO']||'')===ft;
+      const seMatch=!fset||(r['SETOR ATUAL']||'')===fset;
+      const atMatch=!atrasadosOnly||(((r['STATUS']||'').toUpperCase()!=='FINALIZADO')&&daysIdle(r)>=15);
+      return textMatch&&stMatch&&teMatch&&seMatch&&atMatch;
+    });
+    document.getElementById('count-visible').textContent=`${filtered.length} VISÍVEIS`;
+    const tbody=document.getElementById('tbody'); tbody.innerHTML='';
+    filtered.forEach((r,i)=>{
+      const idle=daysIdle(r);
+      const tempo=(typeof daysBetween(r['DATA CADASTRO'],r['DATA MOVIMENTAÇÃO'])==='number')?daysBetween(r['DATA CADASTRO'],r['DATA MOVIMENTAÇÃO']):'';
+      const diasAcao=r['DATA LIMITE AÇÃO']?daysUntil(r['DATA LIMITE AÇÃO']):'';
+      const diasFinal=r['DATA LIMITE FINALIZAÇÃO']?daysUntil(r['DATA LIMITE FINALIZAÇÃO']):'';
+      const tr=document.createElement('tr');
+      tr.innerHTML=
+        `<td>${(r['DATA CADASTRO']||'')}</td>
+         <td>${(r['CNPJ']||'')}</td>
+         <td>${(r['RAZÃO SOCIAL']||'')}</td>
+         <td>${(r['Nº PROCESSO']||'')}</td>
+         <td>${(r['Nº TR']||'')}</td>
+         <td>${(r['SETOR ATUAL']||'')}</td>
+         <td>${(r['ASSUNTO']||'')}</td>
+         <td><span class="status-badge ${idleClass(idle)}">${statusLabel(r)}</span></td>
+         <td>${(r['TÉCNICO']||'')}</td>
+         <td>${(r['DATA MOVIMENTAÇÃO']||'')}</td>
+         <td>${tempoBadge(tempo)}</td>
+         <td>${prazoBadge('AÇÃO', diasAcao)}</td>
+         <td>${prazoBadge('FINALIZAR', diasFinal)}</td>
+         <td>${(r['OBSERVAÇÕES']||'')}</td>
+         <td>
+           <button class="secondary" data-act="edit" data-idx="${i}">EDITAR</button>
+           <button class="secondary" data-act="del" data-idx="${i}">EXCLUIR</button>
+         </td>`;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('button').forEach(b=>{
+      const act=b.dataset.act, idx=parseInt(b.dataset.idx,10);
+      b.onclick=()=>{
+        if(act==='edit') openEditModal(idx);
+        if(act==='del'){
+          if(confirm('EXCLUIR ESTE REGISTRO?')){ registros.splice(idx,1); saveJSON(STORAGE_KEY,registros); renderRegistros(); updateKPIs(); }
+        }
+      };
+    });
+  }
+  function openEditModal(idx){
+    const r=registros[idx];
+    populateLists();
+    document.getElementById('edit-data').value=r['DATA CADASTRO']||'';
+    document.getElementById('edit-cnpj').value=r['CNPJ']||'';
+    document.getElementById('edit-razao').value=r['RAZÃO SOCIAL']||'';
+    document.getElementById('edit-proc').value=r['Nº PROCESSO']||'';
+    document.getElementById('edit-tr').value=r['Nº TR']||'';
+    document.getElementById('edit-assunto').value=r['ASSUNTO']||'';
+    document.getElementById('edit-tecnico').value=r['TÉCNICO']||'';
+    document.getElementById('edit-setor').value=r['SETOR ATUAL']||'';
+    document.getElementById('edit-status').value=r['STATUS']||'EM ANDAMENTO';
+    document.getElementById('edit-mov').value=r['DATA MOVIMENTAÇÃO']||'';
+    document.getElementById('edit-obs').value=r['OBSERVAÇÕES']||'';
+    document.getElementById('edit-backdrop').classList.add('show');
+
+    document.getElementById('btn-edit-save').onclick=()=>{
+      const pAc=parseInt(document.getElementById('edit-prazo-acao').value||'',10);
+      const pFi=parseInt(document.getElementById('edit-prazo-final').value||'',10);
+      const limAc=Number.isInteger(pAc)?addDaysFromToday(pAc):(r['DATA LIMITE AÇÃO']||'');
+      const limFi=Number.isInteger(pFi)?addDaysFromToday(pFi):(r['DATA LIMITE FINALIZAÇÃO']||'');
+
+      r['DATA CADASTRO']=(document.getElementById('edit-data').value||'').trim();
+      r['CNPJ']=(document.getElementById('edit-cnpj').value||'').trim();
+      r['RAZÃO SOCIAL']=(document.getElementById('edit-razao').value||'').trim().toUpperCase();
+      r['Nº PROCESSO']=(document.getElementById('edit-proc').value||'').trim().toUpperCase();
+      r['Nº TR']=(document.getElementById('edit-tr').value||'').trim().toUpperCase();
+      r['ASSUNTO']=(document.getElementById('edit-assunto').value||'').toUpperCase();
+      r['STATUS']=(document.getElementById('edit-status').value||'EM ANDAMENTO').toUpperCase();
+      r['TÉCNICO']=(document.getElementById('edit-tecnico').value||'').toUpperCase();
+      r['SETOR ATUAL']=(document.getElementById('edit-setor').value||'').toUpperCase();
+      r['DATA MOVIMENTAÇÃO']=(document.getElementById('edit-mov').value||'').trim();
+      r['PRAZO AÇÃO (DIAS)']=Number.isInteger(pAc)?pAc:(r['PRAZO AÇÃO (DIAS)']||'');
+      r['PRAZO FINALIZAÇÃO (DIAS)']=Number.isInteger(pFi)?pFi:(r['PRAZO FINALIZAÇÃO (DIAS)']||'');
+      r['DATA LIMITE AÇÃO']=limAc;
+      r['DATA LIMITE FINALIZAÇÃO']=limFi;
+      r['OBSERVAÇÕES']=(document.getElementById('edit-obs').value||'').trim().toUpperCase();
+
+      saveJSON(STORAGE_KEY,registros);
+      // Limpa campos do modal após salvar
+      document.getElementById('edit-data').value='';
+      document.getElementById('edit-cnpj').value='';
+      document.getElementById('edit-razao').value='';
+      document.getElementById('edit-proc').value='';
+      document.getElementById('edit-tr').value='';
+      document.getElementById('edit-assunto').value='';
+      document.getElementById('edit-tecnico').value='';
+      document.getElementById('edit-setor').value='';
+      document.getElementById('edit-status').value='EM ANDAMENTO';
+      document.getElementById('edit-mov').value='';
+      document.getElementById('edit-obs').value='';
+      document.getElementById('edit-prazo-acao').value='';
+      document.getElementById('edit-prazo-final').value='';
+
+      document.getElementById('edit-backdrop').classList.remove('show');
+      renderRegistros(); updateKPIs();
+    };
+    document.getElementById('btn-edit-cancel').onclick=()=>{ document.getElementById('edit-backdrop').classList.remove('show'); };
+  }
+
+  // Add new registro
+  function clearNewForm(){
+    document.getElementById('new-data').value='';
+    document.getElementById('new-cnpj').value='';
+    document.getElementById('new-razao').value='';
+    document.getElementById('new-proc').value='';
+    document.getElementById('new-tr').value='';
+    document.getElementById('new-setor').value='';
+    document.getElementById('new-assunto').value='';
+    document.getElementById('new-status').value='';
+    document.getElementById('new-tecnico').value='';
+    document.getElementById('new-mov').value='';
+    document.getElementById('new-prazo-acao').value='';
+    document.getElementById('new-prazo-final').value='';
+    document.getElementById('new-obs').value='';
+  }
+  document.getElementById('btn-add').onclick=()=>{
+    const data=(document.getElementById('new-data').value||'').trim();
+    const cnpj=(document.getElementById('new-cnpj').value||'').trim();
+    const razao=(document.getElementById('new-razao').value||'').trim().toUpperCase();
+    const proc=(document.getElementById('new-proc').value||'').trim().toUpperCase();
+    const tr=(document.getElementById('new-tr').value||'').trim().toUpperCase();
+    const setor=(document.getElementById('new-setor').value||'').toUpperCase();
+    const assunto=(document.getElementById('new-assunto').value||'').toUpperCase();
+    const status=(document.getElementById('new-status').value||'EM ANDAMENTO').toUpperCase();
+    const tecnico=(document.getElementById('new-tecnico').value||'').toUpperCase();
+    const mov=(document.getElementById('new-mov').value||'').trim();
+    const pAc=parseInt(document.getElementById('new-prazo-acao').value||'',10);
+    const pFi=parseInt(document.getElementById('new-prazo-final').value||'',10);
+    const obs=(document.getElementById('new-obs').value||'').trim().toUpperCase();
+    if(!data||!razao||!proc){ document.getElementById('new-msg').textContent='INFORME DATA, RAZÃO E Nº PROCESSO.'; return; }
+    const limAc=Number.isInteger(pAc)?addDaysFromToday(pAc):'';
+    const limFi=Number.isInteger(pFi)?addDaysFromToday(pFi):'';
+    registros.push({
+      "DATA CADASTRO": data,
+      "CNPJ": cnpj,
+      "RAZÃO SOCIAL": razao,
+      "Nº PROCESSO": proc,
+      "Nº TR": tr,
+      "SETOR ATUAL": setor,
+      "ASSUNTO": assunto,
+      "STATUS": status,
+      "TÉCNICO": tecnico,
+      "DATA MOVIMENTAÇÃO": mov,
+      "PRAZO AÇÃO (DIAS)": Number.isInteger(pAc)?pAc:'',
+      "PRAZO FINALIZAÇÃO (DIAS)": Number.isInteger(pFi)?pFi:'',
+      "DATA LIMITE AÇÃO": limAc,
+      "DATA LIMITE FINALIZAÇÃO": limFi,
+      "OBSERVAÇÕES": obs
+    });
+    saveJSON(STORAGE_KEY,registros);
+    document.getElementById('new-msg').textContent='REGISTRO ADICIONADO.';
+    clearNewForm();
+    updateAll();
+  };
+
+  // Reports
+  function runReport(type){
+    let head=[],rows=[];
+    if(type==='status'){ head=['STATUS','QTD']; rows=aggregate(registros.map(r=>r['STATUS']||'—')); }
+    else if(type==='tecnico'){ head=['TÉCNICO','QTD']; rows=aggregate(registros.map(r=>r['TÉCNICO']||'—')); }
+    else if(type==='setor'){ head=['SETOR','QTD']; rows=aggregate(registros.map(r=>r['SETOR ATUAL']||'—')); }
+    else if(type==='atrasados'){ head=['PROCESSO','RAZÃO','DIAS']; rows=registros.filter(r=>((r['STATUS']||'').toUpperCase()!=='FINALIZADO')&&daysIdle(r)>=15).map(r=>[r['Nº PROCESSO'],r['RAZÃO SOCIAL'],daysIdle(r)]); }
+    else if(type==='tempo-setor'){ head=['SETOR','TEMPO MÉDIO']; const m={}; registros.forEach(r=>{ if((r['STATUS']||'').toUpperCase()==='FINALIZADO') return; const s=r['SETOR ATUAL']||'—'; const d=daysBetween(r['DATA CADASTRO'],r['DATA MOVIMENTAÇÃO']); if(typeof d==='number'){ (m[s]=m[s]||[]).push(d); } }); rows=Object.entries(m).map(([s,v])=>[s,Math.round(v.reduce((a,b)=>a+b,0)/v.length)]); }
+    else if(type==='finalizacoes-mes'){ head=['MÊS','FINALIZADOS']; const m={}; registros.filter(r=>(r['STATUS']||'').toUpperCase()==='FINALIZADO').forEach(r=>{ const d=parseDateBR(r['DATA MOVIMENTAÇÃO']); if(d){ const k=monthKey(d); m[k]=(m[k]||0)+1; } }); rows=Object.entries(m); }
+    else if(type==='mais-recentes'){ head=['PROCESSO','RAZÃO','DATA MOV']; rows=registros.slice().sort((a,b)=>parseDateBR(b['DATA MOVIMENTAÇÃO'])-parseDateBR(a['DATA MOVIMENTAÇÃO'])).slice(0,10).map(r=>[r['Nº PROCESSO'],r['RAZÃO SOCIAL'],r['DATA MOVIMENTAÇÃO']]); }
+    else if(type==='sem-mov-x'){ head=['PROCESSO','RAZÃO','DIAS']; const x=parseInt(document.getElementById('report-xdias').value,10)||30; rows=registros.filter(r=>((r['STATUS']||'').toUpperCase()!=='FINALIZADO')&&daysIdle(r)>=x).map(r=>[r['Nº PROCESSO'],r['RAZÃO SOCIAL'],daysIdle(r)]); }
+    else if(type==='fila-historico'){ head=['SGPE','ASSUNTO','DATA FILA','TÉCNICO','STATUS','ACEITO POR','DATA ACEITE']; const hist=loadJSON(FILA_HIST_KEY)||[]; rows=hist.map(h=>[h.sgpe,h.assunto,h.data,h.tecnico,h.status||'ACEITO',h.aceitoPor||'',h.dataAceite||'']); }
+    document.getElementById('report-head').innerHTML='<tr>'+head.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+    document.getElementById('report-body').innerHTML=rows.map(r=>'<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('');
+    document.getElementById('report-count').textContent=`${rows.length} ITENS`;
+  }
+  document.getElementById('btn-run-report').onclick=()=>{ runReport(document.getElementById('report-type').value); };
+
+  // Export PDF, Excel, CSV
+  document.getElementById('btn-export-pdf').onclick=()=>{
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p','pt','a4');
+    doc.setFontSize(16); doc.text("RELATÓRIO - FILA DE TRABALHO", 297, 40, { align: "center" });
+    doc.setFontSize(10); doc.text(`SISTEMA: ${sysname}`, 297, 58, { align: "center" });
+    let y=90; doc.setFontSize(11); doc.setTextColor(0);
+    doc.text("SGPE",40,y); doc.text("ASSUNTO",110,y); doc.text("DATA",240,y); doc.text("TÉCNICO",310,y); doc.text("STATUS",410,y);
+    y+=8; doc.setDrawColor(200); doc.line(40,y,555,y); y+=12;
+    fila.forEach(f=>{
+      doc.text(String(f.sgpe||''),40,y);
+      doc.text(String((f.assunto||'').toUpperCase()),110,y);
+      doc.text(String(f.data||''),240,y);
+      doc.text(String((f.tecnico||'').toUpperCase()),310,y);
+      doc.text(String(f.status||'PENDENTE'),410,y);
+      y+=16; if(y>760){ doc.addPage(); y=60; }
+    });
+    doc.save("RELATORIO_FILA.pdf");
+  };
+  document.getElementById('btn-export-excel').onclick=()=>{
+    const t=document.getElementById('report-head').outerHTML+document.getElementById('report-body').outerHTML;
+    const blob=new Blob([`<table>${t}</table>`],{type:'application/vnd.ms-excel'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='RELATORIO.XLS'; a.click();
+  };
+  document.getElementById('btn-export-csv').onclick=()=>{
+    const head=[...document.querySelectorAll('#report-head th')].map(th=>th.textContent);
+    const rows=[...document.querySelectorAll('#report-body tr')].map(tr=>[...tr.querySelectorAll('td')].map(td=>`"${String(td.textContent).replace(/"/g,'""')}"`).join(','));
+    const csv=[head.join(','),...rows].join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='RELATORIO.csv'; a.click();
+  };
+  document.getElementById('btn-export-json').onclick=()=>{
+    const blob=new Blob([JSON.stringify({registros,lists,cfg,fila,sysname},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='DADOS.json'; a.click();
+  };
+  document.getElementById('btn-export-csv-data').onclick=()=>{
+    const head=["DATA CADASTRO","CNPJ","RAZÃO SOCIAL","Nº PROCESSO","Nº TR","SETOR ATUAL","ASSUNTO","STATUS","TÉCNICO","DATA MOVIMENTAÇÃO","PRAZO AÇÃO (DIAS)","PRAZO FINALIZAÇÃO (DIAS)","DATA LIMITE AÇÃO","DATA LIMITE FINALIZAÇÃO","OBSERVAÇÕES"];
+    const rows=registros.map(r=>head.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`).join(','));
+    const csv=[head.join(','),...rows].join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='DADOS.csv'; a.click();
+  };
+  document.getElementById('btn-export-xlsx-data').onclick=()=>{
+    const head=["DATA CADASTRO","CNPJ","RAZÃO SOCIAL","Nº PROCESSO","Nº TR","SETOR ATUAL","ASSUNTO","STATUS","TÉCNICO","DATA MOVIMENTAÇÃO","PRAZO AÇÃO (DIAS)","PRAZO FINALIZAÇÃO (DIAS)","DATA LIMITE AÇÃO","DATA LIMITE FINALIZAÇÃO","OBSERVAÇÕES"];
+    const rows=registros.map(r=>'<tr>'+head.map(k=>`<td>${String(r[k]??'')}</td>`).join('')+'</tr>').join('');
+    const table=`<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+    const blob=new Blob([table],{type:'application/vnd.ms-excel'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='DADOS.xls'; a.click();
+  };
+
+  // Seeds (inicialização segura)
+  if(!registros || registros.length===0){
+    registros=[{
+      "DATA CADASTRO":"01/11/2025",
+      "CNPJ":"12.345.678/0001-90",
+      "RAZÃO SOCIAL":"EMPRESA MODELO DE DEMONSTRAÇÃO",
+      "Nº PROCESSO":"SGPE-0001",
+      "Nº TR":"TR-123",
+      "SETOR ATUAL":"SCC/CS",
+      "ASSUNTO":"LICITAÇÃO",
+      "STATUS":"EM ANDAMENTO",
+      "TÉCNICO":"RICHARD",
+      "DATA MOVIMENTAÇÃO":"05/11/2025",
+      "PRAZO AÇÃO (DIAS)":5,
+      "PRAZO FINALIZAÇÃO (DIAS)":10,
+      "DATA LIMITE AÇÃO":addDaysFromToday(2),
+      "DATA LIMITE FINALIZAÇÃO":addDaysFromToday(6),
+      "OBSERVAÇÕES":"REGISTRO EXEMPLO"
+    }];
+    saveJSON(STORAGE_KEY,registros);
+  }
+  if(!fila || fila.length===0){
+    fila=[{sgpe:"SGPE-9999",assunto:"ANÁLISE",data:"02/11/2025",tecnico:"",status:"PENDENTE"}];
+    saveJSON(FILA_KEY,fila);
+  }
+
+  // KPIs + lista de parados (sai ao movimentar)
+  function updateKPIs(){
+    const total=registros.length;
+    const andamento=registros.filter(r=>(r['STATUS']||'').toUpperCase()==='EM ANDAMENTO').length;
+    const finalizado=registros.filter(r=>(r['STATUS']||'').toUpperCase()==='FINALIZADO').length;
+    const tempos=registros.filter(r=>(r['STATUS']||'').toUpperCase()!=='FINALIZADO').map(r=>daysBetween(r['DATA CADASTRO'],r['DATA MOVIMENTAÇÃO'])).filter(x=>typeof x==='number');
+    const media=tempos.length?Math.round(tempos.reduce((a,b)=>a+b,0)/tempos.length):0;
+    const parados15=registros.filter(r=>((r['STATUS']||'').toUpperCase()!=='FINALIZADO')&&daysIdle(r)>=15).length;
+    const acaoLim=registros.filter(r=>{const d=r['DATA LIMITE AÇÃO'];const dias=d?daysUntil(d):null;return ((r['STATUS']||'').toUpperCase()!=='FINALIZADO')&&(dias!==null)&&dias<=cfg.limAcao;}).length;
+    const finalLim=registros.filter(r=>{const d=r['DATA LIMITE FINALIZAÇÃO'];const dias=d?daysUntil(d):null;return ((r['STATUS']||'').toUpperCase()!=='FINALIZADO')&&(dias!==null)&&dias<=cfg.limFinal;}).length;
+    const pendFila=fila.filter(x=>x.status==='PENDENTE').length;
+
+    document.getElementById('kpi-total').textContent=total;
+    document.getElementById('kpi-andamento').textContent=andamento;
+    document.getElementById('kpi-finalizado').textContent=finalizado;
+    document.getElementById('kpi-tempo').textContent=media;
+    document.getElementById('kpi-parados').textContent=parados15;
+    document.getElementById('kpi-acao-limite').textContent=acaoLim;
+    document.getElementById('kpi-final-limite').textContent=finalLim;
+    document.getElementById('kpi-fila').textContent=pendFila;
+
+    const paradosLista=registros
+      .map(r=>({
+        proc:r['Nº PROCESSO']||'',
+        razao:r['RAZÃO SOCIAL']||'',
+        status:(r['STATUS']||'').toUpperCase(),
+        diasParado:daysIdle(r),
+        acao:r['DATA LIMITE AÇÃO']?daysUntil(r['DATA LIMITE AÇÃO']):'',
+        final:r['DATA LIMITE FINALIZAÇÃO']?daysUntil(r['DATA LIMITE FINALIZAÇÃO']):'',
+        fin:(r['STATUS']||'').toUpperCase()==='FINALIZADO'
+      }))
+      .filter(x=>!x.fin && x.diasParado>0)
+      .sort((a,b)=>b.diasParado-a.diasParado)
+      .slice(0,200);
+
+    document.getElementById('tbody-criticos').innerHTML=paradosLista.map(x=>{
+      const acBadge=typeof x.acao==='number'?prazoBadge('AÇÃO',x.acao):'';
+      const fiBadge=typeof x.final==='number'?prazoBadge('FINALIZAR',x.final):'';
+      return `<tr><td>${x.proc}</td><td>${x.razao}</td><td>${x.status}</td><td>${x.diasParado}</td><td>${acBadge}</td><td>${fiBadge}</td></tr>`;
+    }).join('');
+  }
+
+  // Update all
+  function updateAll(){ populateLists(); renderFila(); renderRegistros(); renderUsersTable(); updateKPIs(); }
+
+  // Start app
+  setUI(!!session);
+  if(session){
+    activateSection('tab-dashboard','dashboard');
+    updateAll();
+  }else{
+    activateSection('tab-dashboard','dashboard');
+  }
+
+  // Importers (garantir funcionamento básico)
+  document.getElementById('btn-import-json').onclick=()=>{
+    const f=document.getElementById('fileJson').files[0];
+    if(!f){ document.getElementById('import-msg-json').textContent='SELECIONE UM ARQUIVO.'; return; }
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const data=JSON.parse(r.result);
+        registros=Array.isArray(data.registros)?data.registros:registros;
+        lists=data.lists||lists;
+        cfg=data.cfg||cfg;
+        fila=Array.isArray(data.fila)?data.fila:fila;
+        if(data.sysname) setSysName(data.sysname);
+        saveJSON(STORAGE_KEY,registros); saveJSON(LISTS_KEY,lists); saveJSON(CFG_KEY,cfg); saveJSON(FILA_KEY,fila);
+        document.getElementById('import-msg-json').textContent='IMPORTADO COM SUCESSO.';
+        updateAll();
+      }catch(e){ document.getElementById('import-msg-json').textContent='ARQUIVO INVÁLIDO.'; }
+    };
+    r.readAsText(f);
+  };
+  document.getElementById('btn-import-csv').onclick=()=>{
+    const f=document.getElementById('fileCsv').files[0];
+    if(!f){ document.getElementById('import-msg-csv').textContent='SELECIONE UM CSV.'; return; }
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const lines=r.result.split(/\r?\n/).filter(Boolean);
+        const head=lines[0].split(',');
+        const idx=(name)=>head.findIndex(h=>h.trim().toUpperCase()===name.toUpperCase());
+        const mapField=(row,name)=>{const i=idx(name); return i>=0?(row[i]||'').replace(/^"|"$/g,''):''}
+        registros=lines.slice(1).map(l=>{
+          const cols=l.match(/("([^"]|"")*"|[^,]+)/g)||[];
+          return {
+            "DATA CADASTRO": mapField(cols,"DATA CADASTRO"),
+            "CNPJ": mapField(cols,"CNPJ"),
+            "RAZÃO SOCIAL": mapField(cols,"RAZÃO SOCIAL"),
+            "Nº PROCESSO": mapField(cols,"Nº PROCESSO"),
+            "Nº TR": mapField(cols,"Nº TR"),
+            "SETOR ATUAL": mapField(cols,"SETOR ATUAL"),
+            "ASSUNTO": mapField(cols,"ASSUNTO"),
+            "STATUS": mapField(cols,"STATUS"),
+            "TÉCNICO": mapField(cols,"TÉCNICO"),
+            "DATA MOVIMENTAÇÃO": mapField(cols,"DATA MOVIMENTAÇÃO"),
+            "PRAZO AÇÃO (DIAS)": mapField(cols,"PRAZO AÇÃO (DIAS)"),
+            "PRAZO FINALIZAÇÃO (DIAS)": mapField(cols,"PRAZO FINALIZAÇÃO (DIAS)"),
+            "DATA LIMITE AÇÃO": mapField(cols,"DATA LIMITE AÇÃO"),
+            "DATA LIMITE FINALIZAÇÃO": mapField(cols,"DATA LIMITE FINALIZAÇÃO"),
+            "OBSERVAÇÕES": mapField(cols,"OBSERVAÇÕES")
+          };
+        });
+        saveJSON(STORAGE_KEY,registros);
+        document.getElementById('import-msg-csv').textContent='CSV IMPORTADO.';
+        updateAll();
+      }catch(e){ document.getElementById('import-msg-csv').textContent='ERRO AO IMPORTAR CSV.'; }
+    };
+    r.readAsText(f);
+  };
+})();
+</script>
+</body>
+</html>
