@@ -1282,3 +1282,33 @@ footer{background:var(--panel);border-top:1px solid var(--border)}
 </script>
 </body>
 </html>
+/* --- CORREÇÃO REGISTROS --- */
+/* Permitir quebra de linha em Razão Social (coluna 3) e Observações (coluna 14) */
+#registros table td:nth-child(3),
+#registros table th:nth-child(3),
+#registros table td:nth-child(14),
+#registros table th:nth-child(14) {
+  white-space: normal;       /* permite múltiplas linhas */
+  word-break: break-word;    /* quebra palavras longas */
+  line-height: 1.4;          /* altura de linha confortável, sem exagero */
+}
+
+/* As demais colunas continuam em uma única linha */
+#registros table td:not(:nth-child(3)):not(:nth-child(14)),
+#registros table th:not(:nth-child(3)):not(:nth-child(14)) {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* --- CORREÇÃO DASHBOARD --- */
+/* Cores dinâmicas para os KPIs do Dashboard */
+#dashboard .kpi:nth-child(1) { background:#fee2e2; color:#b91c1c; }   /* Parados > 15 dias */
+#dashboard .kpi:nth-child(2) { background:#ffedd5; color:#c2410c; }   /* Ação limite */
+#dashboard .kpi:nth-child(3) { background:#fef9c3; color:#a16207; }   /* Finalização limite */
+#dashboard .kpi:nth-child(4) { background:#dbeafe; color:#1e40af; }   /* Fila pendente */
+#dashboard .kpi:nth-child(5) { background:#dcfce7; color:#166534; }   /* Total */
+#dashboard .kpi:nth-child(6) { background:#e0f2fe; color:#075985; }   /* Em andamento */
+#dashboard .kpi:nth-child(7) { background:#f3e8ff; color:#6b21a8; }   /* Finalizados */
+#dashboard .kpi:nth-child(8) { background:#fef2f2; color:#991b1b; }   /* Tempo médio */
+
